@@ -156,8 +156,24 @@
         function plot() {
             //d3.json("/static/DATA/dados/" + document.formulario.dadoss.value).then(function (data) {               
 
-                //criação dos eixos X e Y
+                //fix attribution hell
                 horariosData = df;
+                var d2 = [];
+    
+                min = new Date(document.getElementById('min_date').value);
+                max = new Date(document.getElementById('max_date').value);
+                for (item of horariosData){
+                    created_at = new Date(item.created_at);
+                    if (created_at.getTime() <= max.getTime() && created_at.getTime() >= min.getTime()){
+                        d2.push(item);
+                    }
+                }
+
+                horariosData = d2;
+                
+                // free this up
+                d2 = null; //*/
+                
                 var horarios = [];
                 var ex = [];
                 var ey = [];
@@ -263,7 +279,7 @@
                     g3 = {
                         x: respX,
                         y: respY,
-                        name: 'Início dos Picos',
+                        name: 'Peak start',
                         mode: 'markers',
                         marker: {
                             size: 10,
