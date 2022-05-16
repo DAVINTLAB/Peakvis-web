@@ -14,6 +14,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/6.2.1/math.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.1/wordcloud2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
 
 
 <div class="peakvis"><!-- container -->
@@ -61,7 +65,7 @@
 		<div class="col-lg-4 col-sm-3">
             <button class="wagButton" id="highlightid">Highlight</button>
         </div>
-	</div> <!-- cloase submit button -->
+	</div> <!-- close submit button -->
 
 	<div class="row mb-3">	<!-- highlight bar -->
 		<div class="col-lg-1 col-sm-4 mb-2">
@@ -88,6 +92,35 @@
             <div id="plot_tweets" class=""></div>
         </div>
 
+        <div class="row border-top-area">
+            <div class="row-lg-6">
+                <h1>Word Cloud</h1>
+                <canvas id="wc_canvas" class="border-area" width="600" height="500"></canvas>
+                <div id="wc_controls" class="row-lg-6">
+                    <div id="modeforms" class="col-lg-6"><div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="sliding" value="option1">
+                        <label class="form-check-label" for="inlineRadio1">Sliding Window</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="cumulative" value="option2">
+                        <label class="form-check-label" for="inlineRadio2">Cumulative</label>
+                      </div></div>
+                      <div id="inputforms" class="col-lg-6">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="step_label">Step</span>
+                            </div>
+                            <input type="text" class="form-control" id="step" value="15">
+                          </div>
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="maxwords_label">Words</span>
+                            </div>
+                            <input type="text" class="form-control" id="maxwords" value="100">
+                          </div>
+                    <input type="text" class="js-range-slider" name="my_range" value="" />
+                </div>
+            </div>
 	</div>
 
 
@@ -125,20 +158,174 @@
 
         });
 
+        
+        $(".js-range-slider").ionRangeSlider({
+            type: "double",
+            min: -15,
+            max: 15,
+            from: -1,
+            to: 1,
+            grid: true
+            });
+    
 
-        function sleep(milliseconds) {
-            const date = Date.now();
-            let currentDate = null;
-            do {
-            currentDate = Date.now();
-            } while (currentDate - date < milliseconds);
-        }
 
         function pagGithub() {
             window.location.assign("https://github.com/DAVINTLAB");
         }
 
 
+
+        // -------------- wordcloud helper functions ----------
+        function filterTokens(tokens, stopwords) {
+            return tokens.filter(function (value) {
+                return stopwords.indexOf(value.toLowerCase()) === -1
+            });
+        }
+
+        function removeStopwords(word_list){
+            // minified -- can't really do anything about this
+            const stopwords=["i","!", "-", "un", "en","si", "?","una", "!!", "!!!","??","lo","la","el","al", "con","les","y", "u", "h", "c", "x", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9","v", "le", "los","del","@RT","me","my","myself","we","our","ours","ourselves","es","you","your","yours","yourself","yourselves","he","him","his","himself","she","her","hers","herself","it","its","itself","they","them","their","theirs","themselves","what","which","who","whom","this","that","these","those","am","is","are","was","were","be","been","being","have","has","had","having","do","does","did","doing","a","an","the","and","but","if","or","because","as","until","while","of","at","by","for","with","about","against","between","into","through","during","before","after","above","below","to","from","up","down","in","out","on","off","over","under","again","further","then","once","here","there","when","where","why","how","all","any","both","each","few","more","most","other","some","such","no","nor","not","only","own","same","so","than","too","very","s","t","can","will","just","don","should","now","i'm","i've","i'll","they're","they'll","don't","can't","we've","we'll","we're","won't","you'll","you're","who've","who'll","you've","aren't","i'd","doesn't","it's","they've","don't","de","a","o","que","e","do","da","em","um","pra","para","é","com","não","uma","os","no","se","na","por","mais","as","dos","como","mas","foi","ao","ele","das","tem","à","seu","sua","ou","ser","quando","muito","há","nos","já","está","eu","também","só","pelo","pela","até","isso","ela","entre","era","depois","sem","mesmo","aos","ter","seus","quem","nas","me","esse","eles","estão","você","tinha","foram","essa","num","nem","suas","meu","às","minha","têm","numa","pelos","elas","havia","seja","qual","será","nós","tenho","lhe","deles","essas","esses","pelas","este","fosse","dele","tu","te","vocês","vos","lhes","meus","minhas","teu","tua","teus","tuas","nosso","nossa","nossos","nossas","dela","delas","esta","estes","estas","aquele","aquela","aqueles","aquelas","isto","aquilo","estou","está","estamos","estão","estive","esteve","estivemos","estiveram","estava","estávamos","estavam","estivera","estivéramos","esteja","estejamos","estejam","estivesse","estivéssemos","estivessem","estiver","estivermos","estiverem","hei","há","havemos","hão","houve","houvemos","houveram","houvera","houvéramos","haja","hajamos","hajam","houvesse","houvéssemos","houvessem","houver","houvermos","houverem","houverei","houverá","houveremos","houverão","houveria","houveríamos","houveriam","sou","somos","são","era","éramos","eram","fui","foi","fomos","foram","fora","fôramos","seja","sejamos","sejam","fosse","fôssemos","fossem","for","formos","forem","serei","será","seremos","serão","seria","seríamos","seriam","tenho","tem","temos","tém","tinha","tínhamos","tinham","tive","teve","tivemos","tiveram","tivera","tivéramos","tenha","tenhamos","tenham","tivesse","tivéssemos","tivessem","tiver","tivermos","tiverem","terei","terá","teremos","terão","teria","teríamos","teriam"];
+        
+            word_list.forEach(function(w){
+                // TODO: make this work with just one regex
+                tokens = w.text.replace(/[.,"']/g, '');
+                tokens = tokens.replace(/\#\w\w+\s?/g, '').split(/\s/);
+                var wordsToKeep = tokens;
+                var wordsToMaybeKeep = filterTokens(wordsToKeep, stopwords);
+                wordsToKeep = wordsToMaybeKeep.length < wordsToKeep.length ? wordsToMaybeKeep : wordsToKeep;
+                w.text_clean = wordsToKeep;
+            });
+        }
+
+
+        function wordFreq(word_list) {
+            let freqMap = {};
+            let max_words = document.getElementById('maxwords').value;
+
+            word_list.forEach(function(strs){
+                strs.text_clean.forEach(function(w) {
+                    if(w.length > 3){
+                        if (!freqMap[w]) {
+                            freqMap[w] = 0;
+                        }
+                        freqMap[w] += 1;
+                    }
+
+                });
+            });
+
+
+
+            let sortable = [];
+            for (var count in freqMap) {
+                sortable.push([count, freqMap[count]]);
+            }
+
+
+            sortable.sort(function(a, b) {
+                return b[1] - a[1];
+            });
+
+
+            sortable = sortable.splice(0, max_words);
+            let max_occurrences = sortable[0][1];
+            let min_occurrences = sortable[sortable.length-1][1];
+            let font_min = 6;
+            let font_max = 42;
+
+
+            for (var i = 0; i < sortable.length; i++){
+                var cur = sortable[i][1]
+                sortable[i][1] = cur == min_occurrences ? font_min : (cur / max_occurrences) * (font_max - font_min) + font_min;
+            }
+
+
+            return sortable;
+        }
+
+        //assumes step advancement
+        function idxGetterWindow(words, cur_time){
+            cur_idx = idxGetterVidTime(words, cur_time);
+            let max_time = words[0].time;
+            let min_time = words[words.length-1].time;
+
+            var slider = $(".js-range-slider").data("ionRangeSlider");
+            let from = (slider.result.from * 60) * 1000;
+            let to = (slider.result.to * 60) * 1000;
+
+            let bottom_idx;
+            let top_idx;
+
+
+            if ((words[cur_idx].time + from) <= min_time){
+                bottom_idx = words.length-1;
+            }
+
+            if ((words[cur_idx].time + to) >= max_time){
+                top_idx = 0;
+            }
+
+            if (bottom_idx == null){
+                for (var i = cur_idx; i < words.length; i++){
+                    if(words[i].time < (words[cur_idx].time + from)){
+                        bottom_idx = i;
+                        break;
+                    }
+                }
+            }
+
+            if (top_idx == null){
+                for (var i = cur_idx; i > 0; i--){
+                    if(words[i].time > (words[cur_idx].time + to)){
+                        top_idx = i;
+                        break;
+                    }
+                }
+            }
+
+            drawWC(words, top_idx, bottom_idx);
+      
+
+            //return [bottom_idx, top_idx];
+        }
+
+        function idxGetterCumulative(words, current, step){
+            for (var i = current; i > 0 ; i--){
+                if(words[i].time > (words[current].time + step)){
+                    return i;
+                }
+            }
+
+            return false;
+        }
+
+        function idxGetterVidTime(words, vidtime){
+            for (var i = words.length -1; i > -1; i--){
+                if(words[i].time > vidtime){
+                    return i;
+                }
+            }
+
+            return false;
+        }
+
+        function drawWC(words, upper_range, lower_range){
+            wc_arr = wordFreq(words.slice(upper_range, lower_range));
+            let options = {
+                list: wc_arr,
+                gridSize: 18,
+                weightFactor: 3,
+                fontFamily: 'Times, serif',
+                rotateRatio: 0.5,
+                rotationSteps: 2,
+                backgroundColor: '#ffffff'
+                };
+
+            wc = WordCloud(document.getElementById('wc_canvas'), options);
+        }
+
+        // -------------- end of wordcloud helper functions ----------
         
         function plotVideo() {
             
@@ -165,6 +352,7 @@
                 for (item of horariosData){
                     created_at = new Date(item.created_at);
                     if (created_at.getTime() <= max.getTime() && created_at.getTime() >= min.getTime()){
+                        item.time = created_at.getTime();
                         d2.push(item);
                     }
                 }
@@ -172,7 +360,7 @@
                 horariosData = d2;
                 
                 // free this up
-                d2 = null; //*/
+                d2 = null;
                 
                 var horarios = [];
                 var ex = [];
@@ -180,8 +368,22 @@
                 let tweets = [];
                 let infos = [];
                 var count = 0;
+                let vid_time;
+                
+                
+                // wordcloud drawing
+                removeStopwords(horariosData);
+                
+                // miliseconds
+                let wcDrawInterval = document.getElementById('step').value * 1000;
+                let wcIntervalCounter = 0;
+                let wcLowerIndex = horariosData.length-1;
+                let wcUpperIndex = idxGetterCumulative(horariosData, wcLowerIndex, wcDrawInterval);
 
-        //d3.text("static/DATA/testeWC.txt").then(function(text) {
+                drawWC(horariosData, wcUpperIndex, wcLowerIndex);
+
+                // end of wordcloud drawing
+
 
                 for (var i = horariosData.length - 1; i >= 0; i--) {
                     horarios.push(new Date(horariosData[i].created_at));
@@ -197,14 +399,12 @@
                         tweets.push(horariosData[horarios.length - i - 1].text + "         [" + horariosData[horarios.length - i - 1].created_at + "]");
                         infos.push("https://twitter.com/" + horariosData[horarios.length - i - 1].username + "/status/" + horariosData[horarios.length - i - 1].id)
                         started_time.setSeconds(started_time.getSeconds() + 1);
-                        //contadorWD = contadorWD + 1;
                         count = 1;
                     } else {
                         count = count + 1;
                     }
                 }
 
-                //console.log(words);
 
                 let testeA = [];
                 let testeB = [];
@@ -223,16 +423,11 @@
                         count2 = count2 + 1;
                     }
                 }
-                //plot do grafico
+                // line chart plotting
                 let plotDiv = document.getElementById("plotly_div_id");
-                //===================== Arrumar depois =======================
-                console.log(ey.length);
-                console.log(testeB.length);
                 let valor_proporcional30_regulado = 0;
                 if (testeB.length * 30 != ey.length) {
-                    //o valor proporcional eh a diferenca?
                     valor_proporcional30_regulado = testeB.length * 30 - ey.length;
-                    console.log("valor " + valor_proporcional30_regulado);
                 }
 
                 let respX = [0];
@@ -345,6 +540,8 @@
                         eixox.push(time);
                         eixoy.push(ey[cnt]);
 
+                        //console.log(time);
+
 
                         media = cnt - Math.round(document.getElementById("video").currentTime);
 
@@ -358,7 +555,7 @@
                             var futureTime = time.setSeconds(time.getSeconds() + (media * -1));
 
 
-                            //====== Hotfix para o grafico azul ====== //
+                            // quick line chart fix
                             let newX = [];
                             let newY = [];
                             for (let i = 0; i <= cnt; i++) {
@@ -378,10 +575,8 @@
                             Plotly.newPlot(plotDiv, [g1, g2, g3]);
                         }
 
-                        //38103981029318930120
                         document.getElementById("plot_tweets").innerHTML += "<p class='write'>" + tweets[cnt] + "</p>" + "<a class='write' href=" + infos[cnt] + ">LINK</a>";
                         document.getElementById("plot_tweets").scrollTop = document.getElementById("plot_tweets").scrollHeight;
-                        //93280192831093810239
                         var minuteView = {
                             xaxis: {
                                 type: 'date',
@@ -398,8 +593,23 @@
                         Plotly.extendTraces(plotDiv, update, [0, 1])
                         cnt = cnt + 1;
 
-                        //serve para fazer o autoscale automaticamente (porque se nao fica ilegivel)
+                        // needs autoscale here
                         document.querySelector('[data-title="Autoscale"]').click()
+
+
+                        // wc update code
+                        wcIntervalCounter+=1000;
+                        if (wcIntervalCounter >= wcDrawInterval){
+                            wcIntervalCounter = 0;
+                            if (document.getElementById('cumulative').checked){
+                                wcUpperIndex = idxGetterCumulative(horariosData, wcUpperIndex, wcDrawInterval);
+                                drawWC(horariosData, wcUpperIndex, horariosData.length-1);
+                            }else {
+                                vid_time = horariosData[horariosData.length-1].time + (document.getElementById("video").currentTime * 1000);
+                                idxGetterWindow(horariosData, vid_time);
+                            }
+                        }
+
                     }
 
                     document.getElementById("video").onpause = function () {
@@ -409,6 +619,23 @@
                     document.getElementById("video").onplay = function () {
                         taPausado = false;
                     }
+
+                    document.getElementById("video").onseeked = function () {
+                        vid_time = horariosData[horariosData.length-1].time + (document.getElementById("video").currentTime * 1000);
+                        wcIntervalCounter = 0;
+                        if (document.getElementById('cumulative').checked){
+                            drawWC(horariosData, idxGetterVidTime(horariosData, vid_time), horariosData.length-1);
+                        }else{
+                            vid_time = horariosData[horariosData.length-1].time + (document.getElementById("video").currentTime * 1000);
+                            idxGetterWindow(horariosData, vid_time);
+                        }
+                    }
+
+                    $('#step').change(function(){
+                        wcDrawInterval = document.getElementById('step').value * 1000;
+                        wcIntervalCounter = 0;
+                    });
+
 
                     document.getElementById("highlightid").onclick = function () {
                         document.getElementById("video").currentTime = arrResp[indice % arrResp.length] - 1;
