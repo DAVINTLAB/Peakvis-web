@@ -96,6 +96,7 @@
             <div class="row-lg-6">
                 <h1>Word Cloud</h1>
                 <canvas id="wc_canvas" class="border-area" width="600" height="500"></canvas>
+                <div id="plot_tweets2" class=""></div>
                 <div id="wc_controls" class="row-lg-6">
                     <div id="modeforms" class="col-lg-6"><div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="inlineRadioOptions" id="sliding" value="option1">
@@ -319,11 +320,35 @@
                 fontFamily: 'Times, serif',
                 rotateRatio: 0.5,
                 rotationSteps: 2,
+                click: (item) => { getTweets(item); },
                 backgroundColor: '#ffffff'
                 };
 
             wc = WordCloud(document.getElementById('wc_canvas'), options);
         }
+
+
+        function getTweets(word){
+            tweets = [];
+            console.log(word);
+            horariosData.forEach(function(w){
+                if (w.text_clean.includes(word[0])){
+                    tweets.push(w);
+                }
+            });
+            tweets.sort(function(first, second) {
+                return second.retweets - first.retweets;
+            });
+
+            document.getElementById("plot_tweets2").innerHTML = "";
+
+            for (var i = 0; i < 6; i++){
+                document.getElementById("plot_tweets2").innerHTML += "<p class='write'>" + tweets[i].text + "</p>" + "<a class='write' href=>LINK</a> Retweets: " + tweets[i].retweets;
+                document.getElementById("plot_tweets2").scrollTop = document.getElementById("plot_tweets").scrollHeight;
+            }
+        }
+
+
 
         // -------------- end of wordcloud helper functions ----------
         
@@ -337,6 +362,7 @@
             video_container2 = document.getElementById('video');
             video_container2.src = fileURL;
             document.getElementById("plot_tweets").className = "plot_tweets";
+            document.getElementById("plot_tweets2").className = "plot_tweets";
             
         }
 
@@ -423,6 +449,7 @@
                         count2 = count2 + 1;
                     }
                 }
+
                 // line chart plotting
                 let plotDiv = document.getElementById("plotly_div_id");
                 let valor_proporcional30_regulado = 0;
