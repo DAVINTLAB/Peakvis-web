@@ -1,4 +1,4 @@
-# Peakvis
+# Peakvis-web
 PeakVis is a visualization tool that syncronizes a given tweet dataset to a corresponding video of
 a live broadcasted event. Its main features are: _(1)_ a responsive line graph that is directly linked to video playback time, which displays the volume of tweets at each moment of posting. _(2)_ automatic video highlight detection based on spikes of tweet volume. _(3)_ a message board that presents the top shared message at each timestep. _(4)_ a customizable, auto-updating wordcloud representation of what is being shared in the online s pace. Peakvis explores the relationship between live broadcasts and online user-generated content, enabling the analysis of broadcast highlights identified through Twitter posts peaks.
 
